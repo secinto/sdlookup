@@ -7,7 +7,7 @@ This is a golang version of [nrich](https://gitlab.com/shodan-public/nrich) whic
 ## Install
 
 ```shell
-go install github.com/j3ssie/sdlookup@latest
+go install github.com/h4sh5/sdlookup@latest
 ```
 
 ## Usage

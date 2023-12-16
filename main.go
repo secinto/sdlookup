@@ -9,7 +9,9 @@ import (
     "github.com/projectdiscovery/mapcidr"
     "io/ioutil"
     "net"
+    "log"
     "net/http"
+    "time"
     "os"
     "sort"
     "strings"
@@ -36,11 +38,13 @@ type ShodanIPInfo struct {
 
 func main() {
     // cli arguments
-    flag.IntVar(&concurrency, "c", 20, "Set the concurrency level")
+    flag.IntVar(&concurrency, "c", 2, "Set the concurrency level")
     flag.BoolVar(&jsonOutput, "json", false, "Show Output as Json format")
     flag.BoolVar(&csvOutput, "csv", true, "Show Output as CSV format")
     flag.BoolVar(&onlyHost, "open", false, "Show Output as format 'IP:Port' only")
     flag.Parse()
+
+    log.SetOutput(os.Stderr)
 
     stat, _ := os.Stdin.Stat()
     if (stat.Mode() & os.ModeCharDevice) != 0 {
@@ -131,9 +135,17 @@ func sendGET(IP string) string {
     client := &http.Client{Transport: tr}
     resp, err := client.Get(ipURL)
     if err != nil {
-        fmt.Fprintf(os.Stderr, "%v", err)
+        // fmt.Fprintf(os.Stderr, "%v", err)
+        log.Printf("%v\n", err)
         return ""
     }
+
+    if resp.StatusCode == http.StatusTooManyRequests {
+        log.Printf("Too many requests, sleeping\n")
+        time.Sleep(10 * time.Second) 
+        resp, err = client.Get(ipURL)
+    }
+
     defer resp.Body.Close()
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
