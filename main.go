@@ -141,7 +141,7 @@ func sendGET(IP string) string {
     }
 
     if resp.StatusCode == http.StatusTooManyRequests {
-        log.Printf("Too many requests, sleeping\n")
+        log.Printf("Too many requests, sleeping: %s\n", IP)
         time.Sleep(10 * time.Second) 
         resp, err = client.Get(ipURL)
     }
