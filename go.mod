@@ -1,4 +1,4 @@
-module github.com/j3ssie/sdlookup
+module github.com/h4sh5/sdlookup
 
 go 1.17
 
