@@ -3,11 +3,11 @@ sdlookup
 IP Lookups for Open Ports and Vulnerabilities from [internetdb.shodan.io](https://internetdb.shodan.io/)
 
 This is a golang version of [nrich](https://gitlab.com/shodan-public/nrich) which support concurrency and more efficient output.
-
+It is based on https://github.com/h4sh5/sdlookup which itself is based on https://github.com/j3ssie/sdlookup
 ## Install
 
 ```shell
-go install github.com/h4sh5/sdlookup@main
+go install github.com/secinto/sdlookup@main
 ```
 
 ## Usage
