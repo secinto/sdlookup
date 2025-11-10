@@ -46,7 +46,7 @@ func TestCSVFormatter_Format(t *testing.T) {
 			wantError:  false,
 		},
 		{
-			name: "empty result",
+			name: "empty result - simple format",
 			result: &models.ScanResult{
 				IP: "192.168.1.1",
 				Info: &models.ShodanIPInfo{
@@ -55,7 +55,20 @@ func TestCSVFormatter_Format(t *testing.T) {
 				},
 			},
 			onlyIPPort: true,
-			expected:   "",
+			expected:   "192.168.1.1",
+			wantError:  false,
+		},
+		{
+			name: "empty result - full CSV format",
+			result: &models.ScanResult{
+				IP: "192.168.1.1",
+				Info: &models.ShodanIPInfo{
+					IP:    "192.168.1.1",
+					Ports: []int{},
+				},
+			},
+			onlyIPPort: false,
+			expected:   "192.168.1.1,(no ports),,,,",
 			wantError:  false,
 		},
 		{
@@ -113,24 +126,48 @@ func TestJSONFormatter_Format(t *testing.T) {
 }
 
 func TestSimpleFormatter_Format(t *testing.T) {
-	result := &models.ScanResult{
-		IP: "192.168.1.1",
-		Info: &models.ShodanIPInfo{
-			IP:    "192.168.1.1",
-			Ports: []int{80, 443, 8080},
+	tests := []struct {
+		name     string
+		result   *models.ScanResult
+		expected string
+	}{
+		{
+			name: "with ports",
+			result: &models.ScanResult{
+				IP: "192.168.1.1",
+				Info: &models.ShodanIPInfo{
+					IP:    "192.168.1.1",
+					Ports: []int{80, 443, 8080},
+				},
+			},
+			expected: "192.168.1.1:80\n192.168.1.1:443\n192.168.1.1:8080",
+		},
+		{
+			name: "empty ports (omitEmpty=false case)",
+			result: &models.ScanResult{
+				IP: "192.168.1.1",
+				Info: &models.ShodanIPInfo{
+					IP:    "192.168.1.1",
+					Ports: []int{},
+				},
+			},
+			expected: "192.168.1.1",
 		},
 	}
 
-	formatter := NewSimpleFormatter()
-	output, err := formatter.Format(result)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			formatter := NewSimpleFormatter()
+			output, err := formatter.Format(tt.result)
 
-	if err != nil {
-		t.Fatalf("Format() error = %v", err)
-	}
+			if err != nil {
+				t.Fatalf("Format() error = %v", err)
+			}
 
-	expected := "192.168.1.1:80\n192.168.1.1:443\n192.168.1.1:8080"
-	if output != expected {
-		t.Errorf("Format() = %q, want %q", output, expected)
+			if output != tt.expected {
+				t.Errorf("Format() = %q, want %q", output, tt.expected)
+			}
+		})
 	}
 }
 

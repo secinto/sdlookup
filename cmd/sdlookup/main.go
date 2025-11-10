@@ -213,11 +213,15 @@ func processInput(
 	go func() {
 		defer close(done)
 		for result := range results {
-			if result.Error == nil && result.Info != nil && !result.Info.IsEmpty() {
-				if err := writer.Write(result); err != nil {
-					fmt.Fprintf(os.Stderr, "Error writing output: %v\n", err)
+			// Write result if no error and has info
+			if result.Error == nil && result.Info != nil {
+				// Respect cfg.OmitEmpty configuration
+				if !cfg.OmitEmpty || !result.Info.IsEmpty() {
+					if err := writer.Write(result); err != nil {
+						fmt.Fprintf(os.Stderr, "Error writing output: %v\n", err)
+					}
+					servicesCollector.Add(result)
 				}
-				servicesCollector.Add(result)
 			}
 		}
 	}()
@@ -271,14 +275,21 @@ func processStdin(
 	go func() {
 		defer close(done)
 		for result := range results {
-			success := result.Error == nil && result.Info != nil && !result.Info.IsEmpty()
+			// Determine success: no error and has info
+			hasData := result.Error == nil && result.Info != nil
+			// Consider it successful if we got data (even if empty when omitEmpty=false)
+			success := hasData && (!cfg.OmitEmpty || !result.Info.IsEmpty())
 			progress.Increment(success)
 
-			if success {
-				if err := writer.Write(result); err != nil {
-					fmt.Fprintf(os.Stderr, "Error writing output: %v\n", err)
+			// Write result if we have data and should display it
+			if hasData {
+				// Respect cfg.OmitEmpty configuration
+				if !cfg.OmitEmpty || !result.Info.IsEmpty() {
+					if err := writer.Write(result); err != nil {
+						fmt.Fprintf(os.Stderr, "Error writing output: %v\n", err)
+					}
+					servicesCollector.Add(result)
 				}
-				servicesCollector.Add(result)
 			}
 		}
 	}()

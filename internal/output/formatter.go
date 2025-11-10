@@ -37,6 +37,18 @@ func (f *CSVFormatter) Format(result *models.ScanResult) (string, error) {
 		return "", nil
 	}
 
+	// If no ports, show IP with metadata (for omitEmpty=false case)
+	if len(result.Info.Ports) == 0 {
+		if f.onlyIPPort {
+			return fmt.Sprintf("%s", result.IP), nil
+		}
+		hostnames := strings.Join(result.Info.Hostnames, ";")
+		tags := strings.Join(result.Info.Tags, ";")
+		cpes := strings.Join(result.Info.Cpes, ";")
+		vulns := strings.Join(result.Info.Vulns, ";")
+		return fmt.Sprintf("%s,(no ports),%s,%s,%s,%s", result.IP, hostnames, tags, cpes, vulns), nil
+	}
+
 	var lines []string
 	for _, port := range result.Info.Ports {
 		line := fmt.Sprintf("%s:%d", result.IP, port)
@@ -147,6 +159,11 @@ func (f *SimpleFormatter) Format(result *models.ScanResult) (string, error) {
 
 	if result.Info == nil {
 		return "", nil
+	}
+
+	// If no ports, just show IP (for omitEmpty=false case)
+	if len(result.Info.Ports) == 0 {
+		return result.IP, nil
 	}
 
 	var lines []string
