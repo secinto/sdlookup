@@ -1,0 +1,56 @@
+# sdlookup configuration file
+# Copy to ~/.sdlookup.yaml or specify with -config flag
+
+# Number of concurrent workers
+concurrency: 10
+
+# Request timeout
+timeout: 30s
+
+# Rate limit (requests per minute)
+rate_limit: 60
+
+# Omit empty results (no ports/hostnames/vulns)
+omit_empty: true
+
+# API configuration
+api:
+  # Shodan InternetDB API base URL
+  base_url: https://internetdb.shodan.io
+
+  # User agent string
+  user_agent: sdlookup/2.0
+
+  # Verify TLS certificates (recommended: true)
+  verify_tls: true
+
+  # Maximum number of retries on failure
+  max_retries: 3
+
+  # Backoff duration between retries
+  retry_backoff: 2s
+
+# Output configuration
+output:
+  # Output format: csv, json, or simple (IP:Port only)
+  format: csv
+
+  # Also create services.json file
+  show_services: false
+
+  # Show progress indicator (for stdin input)
+  show_progress: true
+
+  # Optional: Write output to file instead of stdout
+  # file_path: output.txt
+
+# Cache configuration
+cache:
+  # Enable caching of API responses
+  enabled: true
+
+  # Time-to-live for cache entries
+  ttl: 24h
+
+  # Maximum number of cached items
+  max_size: 10000

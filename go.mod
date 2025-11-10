@@ -4,12 +4,10 @@ go 1.23
 
 toolchain go1.23.2
 
-replace secinto/checkfix_utils => ../checkfix_utils
-
 require (
 	github.com/json-iterator/go v1.1.12
 	github.com/projectdiscovery/mapcidr v1.1.34
-	secinto/checkfix_utils v0.1.2
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (

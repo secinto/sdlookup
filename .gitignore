@@ -1,2 +1,27 @@
-.idea
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Binaries
 main
+main.go.old
+sdlookup
+build/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test coverage
+*.test
+*.out
+coverage.html
+coverage.out
+
+# Output files
+services.json
+
+# OS
+.DS_Store
