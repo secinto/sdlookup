@@ -48,13 +48,9 @@ func (s *Scanner) ScanIP(ctx context.Context, ip string) (*models.ScanResult, er
 		}, err
 	}
 
-	// Omit empty results if configured
+	// Log if result is empty (filtering happens at output layer)
 	if s.omitEmpty && info.IsEmpty() {
-		s.logger.Debug("omitting empty result", "ip", ip)
-		return &models.ScanResult{
-			IP:   ip,
-			Info: info,
-		}, nil
+		s.logger.Debug("result is empty", "ip", ip)
 	}
 
 	return &models.ScanResult{
