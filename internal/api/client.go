@@ -60,6 +60,10 @@ func WithVerifyTLS(verify bool) ClientOption {
 // WithRateLimit sets the rate limit (requests per minute)
 func WithRateLimit(requestsPerMinute int) ClientOption {
 	return func(c *Client) {
+		// Close old limiter to stop its background goroutine
+		if c.limiter != nil {
+			c.limiter.Close()
+		}
 		c.limiter = NewRateLimiter(requestsPerMinute)
 	}
 }
@@ -275,4 +279,12 @@ func (r *RateLimiter) Close() {
 		close(r.stop)
 		r.ticker.Stop()
 	})
+}
+
+// Close cleans up client resources including stopping the rate limiter
+func (c *Client) Close() error {
+	if c.limiter != nil {
+		c.limiter.Close()
+	}
+	return nil
 }
